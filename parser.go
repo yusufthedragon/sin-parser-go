@@ -29,6 +29,12 @@ var monthList = map[string]string{
 // region contains data from parsed region.json.
 var region map[string]map[string]string
 
+// isFemale contains status gender from integer date.
+var isFemale bool
+
+// dateInt contains integer of date.
+var dateInt int
+
 func init() {
 	setRegion()
 }
@@ -39,12 +45,12 @@ func ParseSIN(sin string) (*SIN, error) {
 		return nil, errors.New("Invalid Single Identity Number Format")
 	}
 
-	bornDate, err := getBornDate(sin[6:12])
+	gender, err := getGender(sin[6:8])
 	if err != nil {
 		return nil, err
 	}
 
-	gender, err := getGender(sin[6:8])
+	bornDate, err := getBornDate(sin[6:12])
 	if err != nil {
 		return nil, err
 	}
@@ -99,18 +105,12 @@ func ParseSIN(sin string) (*SIN, error) {
 
 // getBornDate function gets the born date from the given serial number.
 func getBornDate(bornDate string) (string, error) {
-	date := bornDate[0:2]
-	dateInt, err := strconv.ParseInt(date, 10, 64)
+	date := strconv.Itoa(dateInt)
 
-	if err != nil {
-		return "", err
+	if dateInt < 10 {
+		date = "0" + date
 	}
 
-	if int(dateInt) > 40 {
-		dateInt -= 40
-	}
-
-	date = strconv.Itoa(int(dateInt))
 	month := bornDate[2:4]
 	year := bornDate[4:6]
 
@@ -125,14 +125,14 @@ func getBornDate(bornDate string) (string, error) {
 
 // getGender function determines the gender from the given date.
 func getGender(date string) (string, error) {
-	genderID, err := strconv.ParseInt(date, 10, 64)
-	gender := "Male"
-
+	err := setBornInt(date)
 	if err != nil {
 		return "", err
 	}
 
-	if int(genderID) > 40 {
+	gender := "Male"
+
+	if isFemale {
 		gender = "Female"
 	}
 
@@ -144,6 +144,24 @@ func getRegionName(regionType string, regionID int) string {
 	ID := strconv.Itoa(regionID)
 
 	return region[regionType][ID]
+}
+
+// setBornInt function sets the date to integer to determine it's a female or not.
+func setBornInt(date string) error {
+	dateInteger, err := strconv.ParseInt(date, 10, 64)
+
+	if err != nil {
+		return err
+	}
+
+	if int(dateInteger) > 40 {
+		dateInteger -= 40
+		isFemale = true
+	}
+
+	dateInt = int(dateInteger)
+
+	return nil
 }
 
 // setRegion function reads the region.json file and store the data to variable.
