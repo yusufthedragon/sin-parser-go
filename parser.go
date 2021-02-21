@@ -35,6 +35,9 @@ var isFemale bool
 // dateInt contains integer of date.
 var dateInt int
 
+// dateInt contains integer of month.
+var monthInt int
+
 func init() {
 	setRegion()
 }
@@ -45,7 +48,7 @@ func ParseSIN(sin string) (*SIN, error) {
 		return nil, errors.New("Invalid Single Identity Number Format")
 	}
 
-	gender, err := getGender(sin[6:8])
+	gender, err := getGender(sin[6:10])
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +87,8 @@ func ParseSIN(sin string) (*SIN, error) {
 		postalCode = splitDistrict[1]
 	}
 
+	zodiac := getZodiac()
+
 	parsedData := SIN{
 		BornDate:     bornDate,
 		CityID:       int(cityID),
@@ -95,6 +100,7 @@ func ParseSIN(sin string) (*SIN, error) {
 		ProvinceID:   int(provinceID),
 		ProvinceName: provinceName,
 		UniqueCode:   sin[12:16],
+		Zodiac:       zodiac,
 	}
 
 	isValid := validateSIN(parsedData)
@@ -146,10 +152,40 @@ func getRegionName(regionType string, regionID int) string {
 	return region[regionType][ID]
 }
 
+// getZodiac function gets the zodiac name based on month and date.
+func getZodiac() string {
+	if (monthInt == 1 && dateInt >= 20) || (monthInt == 2 && dateInt < 19) {
+		return "Aquarius"
+	} else if (monthInt == 2 && dateInt >= 19) || (monthInt == 3 && dateInt < 21) {
+		return "Pisces"
+	} else if (monthInt == 3 && dateInt >= 21) || (monthInt == 4 && dateInt < 20) {
+		return "Aries"
+	} else if (monthInt == 4 && dateInt >= 20) || (monthInt == 5 && dateInt < 21) {
+		return "Taurus"
+	} else if (monthInt == 5 && dateInt >= 21) || (monthInt == 6 && dateInt < 21) {
+		return "Gemini"
+	} else if (monthInt == 6 && dateInt >= 21) || (monthInt == 7 && dateInt < 23) {
+		return "Cancer"
+	} else if (monthInt == 7 && dateInt >= 23) || (monthInt == 8 && dateInt < 23) {
+		return "Leo"
+	} else if (monthInt == 8 && dateInt >= 23) || (monthInt == 9 && dateInt < 23) {
+		return "Virgo"
+	} else if (monthInt == 9 && dateInt >= 23) || (monthInt == 10 && dateInt < 24) {
+		return "Libra"
+	} else if (monthInt == 10 && dateInt >= 24) || (monthInt == 11 && dateInt < 23) {
+		return "Scorpio"
+	} else if (monthInt == 11 && dateInt >= 23) || (monthInt == 12 && dateInt < 22) {
+		return "Sagitarius"
+	} else if (monthInt == 12 && dateInt >= 22) || (monthInt == 1 && dateInt < 20) {
+		return "Capricorn"
+	}
+
+	return "Zodiak Not Found"
+}
+
 // setBornInt function sets the date to integer to determine it's a female or not.
 func setBornInt(date string) error {
-	dateInteger, err := strconv.ParseInt(date, 10, 64)
-
+	dateInteger, err := strconv.ParseInt(date[0:2], 10, 64)
 	if err != nil {
 		return err
 	}
@@ -159,7 +195,13 @@ func setBornInt(date string) error {
 		isFemale = true
 	}
 
+	monthInteger, err := strconv.ParseInt(date[2:4], 10, 64)
+	if err != nil {
+		return err
+	}
+
 	dateInt = int(dateInteger)
+	monthInt = int(monthInteger)
 
 	return nil
 }

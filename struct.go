@@ -13,4 +13,5 @@ type SIN struct {
 	ProvinceID   int
 	ProvinceName string
 	UniqueCode   string
+	Zodiac       string
 }
