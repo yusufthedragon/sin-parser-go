@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	goage "github.com/bearbin/go-age"
 )
 
 // montList contains list of months.
@@ -58,6 +60,11 @@ func ParseSIN(sin string) (*SIN, error) {
 		return nil, err
 	}
 
+	age, err := getAge(bornDate)
+	if err != nil {
+		return nil, err
+	}
+
 	provinceID, err := strconv.ParseInt(sin[0:2], 10, 64)
 	if err != nil {
 		return nil, err
@@ -90,6 +97,7 @@ func ParseSIN(sin string) (*SIN, error) {
 	zodiac := getZodiac()
 
 	parsedData := SIN{
+		Age:          age,
 		BornDate:     bornDate,
 		CityID:       int(cityID),
 		CityName:     cityName,
@@ -107,6 +115,24 @@ func ParseSIN(sin string) (*SIN, error) {
 	parsedData.IsValid = isValid
 
 	return &parsedData, nil
+}
+
+// getAge function gets the age based on current date and born date.
+func getAge(date string) (int, error) {
+	// currentTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
+	// currentTime := time.Now().UTC()
+	bornTime, err := time.Parse("02 January 2006", date)
+
+	if err != nil {
+		return 0, err
+	}
+
+	// interval := currentTime.Sub(bornTime)
+	// age := math.Floor(interval.Hours() / 24 / 365)
+
+	age := goage.Age(bornTime)
+
+	return int(age), nil
 }
 
 // getBornDate function gets the born date from the given serial number.
@@ -223,5 +249,5 @@ func setRegion() {
 
 // validateSIN function determines the result is valid or not.
 func validateSIN(data SIN) bool {
-	return data.ProvinceName != "" && data.CityName != "" && data.DistrictName != "" && data.PostalCode != ""
+	return data.Age != 0 && data.ProvinceName != "" && data.CityName != "" && data.DistrictName != "" && data.PostalCode != ""
 }

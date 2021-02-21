@@ -2,6 +2,7 @@ package sinparser
 
 // SIN struct contains data of Indonesian Identity Card.
 type SIN struct {
+	Age          int
 	BornDate     string
 	CityID       int
 	CityName     string
