@@ -7,13 +7,13 @@ import (
 )
 
 func TestParseSIN(t *testing.T) {
-	test, err := ParseSIN("3204110609970001")
+	parsedData, err := ParseSIN("3204110609970001")
 
 	if err != nil {
 		panic(err)
 	}
 
-	s, _ := json.MarshalIndent(test, "", "\t")
+	s, _ := json.MarshalIndent(parsedData, "", "\t")
 
 	fmt.Println(string(s))
 }

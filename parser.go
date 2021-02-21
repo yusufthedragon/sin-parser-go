@@ -119,16 +119,11 @@ func ParseSIN(sin string) (*SIN, error) {
 
 // getAge function gets the age based on current date and born date.
 func getAge(date string) (int, error) {
-	// currentTime := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
-	// currentTime := time.Now().UTC()
 	bornTime, err := time.Parse("02 January 2006", date)
 
 	if err != nil {
 		return 0, err
 	}
-
-	// interval := currentTime.Sub(bornTime)
-	// age := math.Floor(interval.Hours() / 24 / 365)
 
 	age := goage.Age(bornTime)
 
